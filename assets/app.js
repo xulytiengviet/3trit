@@ -33,7 +33,7 @@
   const $=id=>document.getElementById(id);
   const t=k=>langTexts[locale][k]||k;
   const tritArr=(i,balanced)=>{const a=[Math.floor(i/9),Math.floor(i/3)%3,i%3];return balanced?a.map(x=>x-1):a;};
-  const tritFmt=a=>a.map(x=>x===-1?"−":x===1?"+":x===0?"0":"2").join("");
+  const tritFmt=(a,balanced=true)=>a.map(x=>balanced?(x===-1?"−":x===1?"+":"0"):String(x)).join("");
   const decodeTrits=(a,balanced)=>{const u=balanced?a.map(x=>x+1):a;const i=u[0]*9+u[1]*3+u[2];if(!Number.isInteger(i)||i<0||i>26)throw Error("Invalid trit");return CORE[i];};
   function validateCore(s){return /^[ a-z]*$/.test(s)}
   function encodeCore(s,balanced){if(!validateCore(s))throw Error("Outside T27-Core");return Array.from(s,c=>tritArr(CORE.indexOf(c),balanced));}
@@ -102,7 +102,7 @@
         result(t("extended")+" "+t("warning"),"good");return;
       }
       const groups=encodeCore(cvss,balanced),decoded=decodeCore(groups,balanced),packed=packCore(cvss),unpacked=unpackCore(packed.blocks);
-      lastTrits=groups.map(tritFmt).join(" ");const preview=groups.slice(0,80).map(tritFmt).join(" ");
+      lastTrits=groups.map(g=>tritFmt(g,balanced)).join(" ");const preview=groups.slice(0,80).map(g=>tritFmt(g,balanced)).join(" ");
       $("out-trit").textContent=preview+(groups.length>80?" …":"");
       $("out-packed").textContent=short(packed.hex)+"\n"+cvss.length+" symbols / "+packed.bytes.length+" packed bytes (payload only)";
       $("out-round").textContent=short(decoded)+"\n"+((decoded===cvss&&unpacked===cvss)?"PASS: exact T27 round-trip":"FAIL");
